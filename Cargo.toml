@@ -1,0 +1,16 @@
+[package]
+name = "derive-try-from-primitive"
+version = "0.1.0"
+authors = ["Jeff Belgum <jeffbelgum@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/jeffbelgum/derive-from-primitive"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "0.3"
+
+[dependencies.syn]
+version = "0.11.11"
+features = ["full"]
