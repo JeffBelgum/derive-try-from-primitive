@@ -2,8 +2,14 @@
 name = "derive-try-from-primitive"
 version = "0.1.0"
 authors = ["Jeff Belgum <jeffbelgum@gmail.com>"]
-license = "MIT"
-repository = "https://github.com/jeffbelgum/derive-from-primitive"
+license = "MIT/Apache-2.0"
+repository = "https://github.com/jeffbelgum/derive-try-from-primitive"
+description = "Custom derive a try_from method for primitive to enum conversions"
+documentation = "https://docs.rs/derive-try-from-primitive/"
+homepage = "https://github.com/jeffbelgum/derive-try-from-primitive"
+readme = "README.md"
+keywords = ["tryfrom", "custom", "derive", "enum", "primitive"]
+categories = []
 
 [lib]
 proc-macro = true
