@@ -54,43 +54,43 @@ fn try_from_primitive(ast: &syn::MacroInput, variants: &[syn::Variant]) -> quote
             match ident.as_ref() {
                 "u8" => {
                     let discr = discr.unwrap() as u8;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 "u16" => {
                     let discr = discr.unwrap() as u16;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 "u32" => {
                     let discr = discr.unwrap() as u32;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 "u64" => {
                     let discr = discr.unwrap() as u64;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 "usize" => {
                     let discr = discr.unwrap() as usize;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 "i8" => {
                     let discr = discr.unwrap() as i8;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 "i16" => {
                     let discr = discr.unwrap() as i16;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 "i32" => {
                     let discr = discr.unwrap() as i32;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 "i64" => {
                     let discr = discr.unwrap() as i64;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 "isize" => {
                     let discr = discr.unwrap() as isize;
-                    quote!(#discr => Some(#name::#v_name))
+                    quote!(#discr => Ok(#name::#v_name))
                 }
                 ty => {
                     panic!("#[derive(TryFromPrimitive)] does not support enum repr type {:?}",
@@ -99,20 +99,22 @@ fn try_from_primitive(ast: &syn::MacroInput, variants: &[syn::Variant]) -> quote
             }
         } else {
             let discr = discr.unwrap() as usize;
-            quote!(#discr => Some(#name::#v_name))
+            quote!(#discr => Ok(#name::#v_name))
         }
     });
     let match_arms = quote![#(#match_arms),*];
 
 
     quote! {
-        impl #impl_generics #name #ty_generics #where_clause {
+        impl #impl_generics core::convert::TryFrom<#repr> for #name #ty_generics #where_clause {
+            type Error = #repr;
+
             #[doc = #doc]
             #lint_attrs
-            pub fn try_from(n: #repr) -> Option<#name> {
+            fn try_from(n: #repr) -> Result<Self, Self::Error> {
                 match n {
                     #match_arms,
-                    _ => None
+                    _ => Err(n)
                 }
             }
         }
