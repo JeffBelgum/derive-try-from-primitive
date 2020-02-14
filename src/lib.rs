@@ -35,7 +35,7 @@ use syn::ConstExpr::Lit;
 fn try_from_primitive(ast: &syn::MacroInput, variants: &[syn::Variant]) -> quote::Tokens {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
-    let doc = format!("TryFrom for `{}`.", name);
+    let doc = format!("Generated impl [TryFrom](std::convert::TryFrom) for `{}`.", name);
     let lint_attrs = collect_parent_lint_attrs(&ast.attrs);
     let lint_attrs = quote![#(#lint_attrs),*];
 
