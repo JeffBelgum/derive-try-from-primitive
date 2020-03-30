@@ -1,5 +1,4 @@
 #![crate_type = "proc-macro"]
-
 #![recursion_limit = "192"]
 
 use {
@@ -8,19 +7,26 @@ use {
     syn::{parse_macro_input, DeriveInput},
 };
 
-
 #[proc_macro_derive(TryFromPrimitive, attributes(TryFromPrimitive))]
 pub fn derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let result = match &input.data {
-        syn::Data::Enum(data) => try_from_primitive_for_enum(&input, data.variants.iter().cloned().collect()),
+        syn::Data::Enum(data) => {
+            try_from_primitive_for_enum(&input, data.variants.iter().cloned().collect())
+        }
         syn::Data::Struct(_) => panic!("#[derive(TryFromPrimitive)] not supported for structs"),
         syn::Data::Union(_) => panic!("#[derive(TryFromPrimitive)] not supported for unions"),
     };
-    result.to_string().parse().expect("Couldn't parse string to tokens")
+    result
+        .to_string()
+        .parse()
+        .expect("Couldn't parse string to tokens")
 }
 
-fn try_from_primitive_for_enum(ast: &syn::DeriveInput, variants: Vec<syn::Variant>) -> proc_macro2::TokenStream {
+fn try_from_primitive_for_enum(
+    ast: &syn::DeriveInput,
+    variants: Vec<syn::Variant>,
+) -> proc_macro2::TokenStream {
     if variants.is_empty() {
         panic!("#[derive(TryFromPrimitive)] cannot be implemented for enums with zero variants");
     }
@@ -29,16 +35,19 @@ fn try_from_primitive_for_enum(ast: &syn::DeriveInput, variants: Vec<syn::Varian
     quote!(#_impl)
 }
 
-
-fn try_from_primitive(ast: &syn::DeriveInput, variants: Vec<syn::Variant>) -> proc_macro2::TokenStream {
+fn try_from_primitive(
+    ast: &syn::DeriveInput,
+    variants: Vec<syn::Variant>,
+) -> proc_macro2::TokenStream {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
-    let doc = format!("Generated impl [TryFrom](std::convert::TryFrom) for `{}`.", name);
+    let doc = format!(
+        "Generated impl [TryFrom](std::convert::TryFrom) for `{}`.",
+        name
+    );
     let lint_attrs = collect_parent_lint_attrs(&ast.attrs);
     let lint_attrs = quote![#(#lint_attrs),*];
     let repr = find_repr_attr(&ast.attrs);
-
-
 
     let mut discr = None;
     let match_arms = variants.iter().map(|v| {
@@ -110,7 +119,6 @@ fn try_from_primitive(ast: &syn::DeriveInput, variants: Vec<syn::Variant>) -> pr
     });
     let match_arms = quote![#(#match_arms),*];
 
-
     quote! {
         impl #impl_generics core::convert::TryFrom<#repr> for #name #ty_generics #where_clause {
             type Error = #repr;
@@ -169,15 +177,14 @@ fn find_repr_attr(attrs: &[syn::Attribute]) -> Option<syn::Ident> {
         }
     }
 
-    let reprs: Vec<syn::Meta> = attrs.iter().flat_map(|attr| {
-        attr.parse_meta().map(|meta| {
-            if is_repr(&meta) {
-                Some(meta)
-            } else {
-                None
-            }
-        }).unwrap_or(None)
-    }).collect();
+    let reprs: Vec<syn::Meta> = attrs
+        .iter()
+        .flat_map(|attr| {
+            attr.parse_meta()
+                .map(|meta| if is_repr(&meta) { Some(meta) } else { None })
+                .unwrap_or(None)
+        })
+        .collect();
 
     if reprs.is_empty() {
         return None;

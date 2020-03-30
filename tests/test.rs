@@ -1,16 +1,13 @@
-use {
-    core::convert::TryFrom,
-    derive_try_from_primitive::TryFromPrimitive,
-};
+use {core::convert::TryFrom, derive_try_from_primitive::TryFromPrimitive};
 
 #[derive(TryFromPrimitive, Debug, PartialEq)]
 #[repr(u16)]
 enum Foo {
-    A, // first discriminant does not have to be specified
+    A,       // first discriminant does not have to be specified
     B = 100, // specified discriminant following unspecified
     C = 200, // specified discriminant following specified
-    D, // unspecified discriminant following specified
-    E, // unspecified discriminant following unspecified
+    D,       // unspecified discriminant following specified
+    E,       // unspecified discriminant following unspecified
 }
 
 #[test]
