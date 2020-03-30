@@ -6,20 +6,26 @@ use {
 #[derive(TryFromPrimitive, Debug, PartialEq)]
 #[repr(u16)]
 enum Foo {
-    Bar,
-    Baz = 100,
-    Quix = 200,
+    A, // first discriminant does not have to be specified
+    B = 100, // specified discriminant following unspecified
+    C = 200, // specified discriminant following specified
+    D, // unspecified discriminant following specified
+    E, // unspecified discriminant following unspecified
 }
 
 #[test]
 fn generated_impl() {
-    let bar = Foo::try_from(0);
-    let baz = Foo::try_from(100);
-    let quix = Foo::try_from(200);
+    let a = Foo::try_from(0);
+    let b = Foo::try_from(100);
+    let c = Foo::try_from(200);
+    let d = Foo::try_from(201);
+    let e = Foo::try_from(202);
     let bad = Foo::try_from(300);
-    assert_eq!(bar.unwrap(), Foo::Bar);
-    assert_eq!(baz.unwrap(), Foo::Baz);
-    assert_eq!(quix.unwrap(), Foo::Quix);
+    assert_eq!(a.unwrap(), Foo::A);
+    assert_eq!(b.unwrap(), Foo::B);
+    assert_eq!(c.unwrap(), Foo::C);
+    assert_eq!(d.unwrap(), Foo::D);
+    assert_eq!(e.unwrap(), Foo::E);
     if let Err(value) = bad {
         assert_eq!(value, 300, "Input is returned for convenience");
     }
