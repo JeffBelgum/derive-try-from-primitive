@@ -125,7 +125,7 @@ fn try_from_primitive(
 
             #[doc = #doc]
             #lint_attrs
-            fn try_from(n: #repr) -> Result<Self, Self::Error> {
+            fn try_from(n: #repr) -> core::result::Result<Self, Self::Error> {
                 match n {
                     #match_arms,
                     _ => Err(n)
